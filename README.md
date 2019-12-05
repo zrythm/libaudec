@@ -7,6 +7,26 @@ ffmpeg, sndfile and libsamplerate for reading and
 resampling audio files, based on Robin Gareus' `audio_decoder`
 code (https://github.com/x42/silan/tree/master/audio_decoder)
 
+This library is meant to be linked in statically
+to larger projects.
+
+# Usage
+
+Use `#include <audec/ad.h>` in your C/C++ project and
+add a dependency to the library using the pkg-config
+name `audec`.
+
+# Building
+
+To build only:
+
+    meson build
+    ninja -C build
+
+Installation:
+
+    ninja -C build install
+
 # License
 libaudec is released under the GNU LGPLv3+. See the
 file COPYING for more details. Some files, where
