@@ -343,6 +343,12 @@ audec_read (
               return -1;
             }
           ret = total_read;
+
+          dbg (
+            AUDEC_DEBUG_LEVEL_INFO,
+            "%ld frames read after resampling "
+            "(out buffer size %lu)",
+            total_read, out_buf_size);
         }
     }
   else
@@ -351,6 +357,12 @@ audec_read (
         malloc (in_len * sizeof (float));
       memcpy (*out, in, in_len * sizeof (float));
       ret = nfo.frames;
+
+      dbg (
+        AUDEC_DEBUG_LEVEL_INFO,
+        "No resampling done, returning %ld frames "
+        "(out buffer size %lu)",
+        nfo.frames, in_len);
     }
 
   return ret;
