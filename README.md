@@ -52,6 +52,10 @@ Installation:
 
     ninja -C build install
 
+# Patches/Issues
+Send email to dev at zrythm.org or open an issue in
+https://redmine.zrythm.org/projects/libaudec/issues
+
 # License
 libaudec is released under the GNU Affero GPLv3+.
 See the file COPYING for more details. Some files,
