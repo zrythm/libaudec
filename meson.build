@@ -28,6 +28,7 @@ project (
   )
 
 srcs = []
+subdir('inc')
 subdir('src')
 
 cc = meson.get_compiler ('c')
