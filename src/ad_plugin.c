@@ -178,7 +178,9 @@ get_buf_size_for_sample_rate (
       if (fabs (resample_ratio - 1.0) < 1e-20)
         {
           /* no sample rate change needed */
-          return (ssize_t) sample_rate;
+          return
+            (ssize_t) nfo->frames *
+            (ssize_t) nfo->channels;
         }
       if (src_is_valid_ratio (resample_ratio) == 0)
         {
@@ -370,9 +372,7 @@ audec_read (
     }
   else
     {
-      *out =
-        malloc (in_len * sizeof (float));
-      memcpy (*out, in, in_len * sizeof (float));
+      *out = in;
       ret = nfo.frames;
 
       dbg (
