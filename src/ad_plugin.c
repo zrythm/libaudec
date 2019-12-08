@@ -223,7 +223,7 @@ audec_read (
   size_t in_len =
     (size_t) (nfo.frames * nfo.channels);
   float * in = malloc (in_len * sizeof (float));
-  ssize_t ret =
+  ssize_t ret = /* note: includes channels */
     decoder->plugin->read (
       decoder->data, in, in_len);
 
@@ -343,7 +343,7 @@ audec_read (
               *out = NULL;
               return -1;
             }
-          ret = total_read * (ssize_t) nfo.channels;
+          ret = total_read;
         }
     }
   else
@@ -351,7 +351,7 @@ audec_read (
       *out =
         malloc (in_len * sizeof (float));
       memcpy (*out, in, in_len * sizeof (float));
-      ret = in_len;
+      ret = in_len / (ssize_t) nfo.channels;
     }
 
   return ret;

@@ -122,8 +122,8 @@ audec_seek (
  * the same as the given sample rate no resampling
  * will be done.
  *
- * @return the total number of read samples
- * (including all channels).
+ * @return the total number of read samples for each
+ * channel.
  */
 ssize_t
 audec_read (

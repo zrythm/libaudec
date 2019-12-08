@@ -10,6 +10,9 @@ and resampling audio files, based on Robin Gareus'
 This library is meant to be linked in statically
 to larger projects.
 
+Until version 1.0 is released, the API is subject
+to change.
+
 # Usage
 
 Use `#include <audec/audec.h>` in your C/C++
