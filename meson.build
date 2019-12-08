@@ -170,6 +170,10 @@ audec = static_library (
   install: true,
 )
 
+libaudec_dep = declare_dependency (
+  include_directories: inc,
+  link_with: audec)
+
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
   libraries: audec,

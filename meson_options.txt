@@ -19,4 +19,5 @@ option (
   'enable_ffmpeg',
   type: 'boolean',
   value: false,
+  yield: true,
   description: 'Compile with ffmpeg (for MP3 support)')
