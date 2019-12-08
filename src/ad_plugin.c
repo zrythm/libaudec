@@ -412,7 +412,7 @@ audec_free_nfo (
 }
 
 void
-audec_dump_nfo (
+audec_dump_info (
   AudecDebugLevel dbglvl,
   AudecInfo *     nfo)
 {

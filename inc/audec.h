@@ -195,7 +195,8 @@ audec_read_mono_dbl (
  */
 void
 audec_dump_info (
-  int dbglvl, AudecInfo * info);
+  AudecDebugLevel dbglvl,
+  AudecInfo *     nfo);
 
 /**
  * Set audio-decoder debug level.
