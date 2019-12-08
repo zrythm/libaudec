@@ -51,6 +51,8 @@ int main (
     ((double) sample_rate /
      expected_sample_rate_before);
 
+  audec_init ();
+
   /* read info */
   AudecInfo nfo;
   AudecHandle * handle =

@@ -53,7 +53,7 @@ typedef struct adecoder
 
 /* samplecat api */
 
-void ad_init() { /* global init */ }
+void audec_init() { /* global init */ }
 
 static ad_plugin const *
 choose_backend (
