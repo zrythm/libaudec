@@ -53,9 +53,10 @@ Installation:
     ninja -C build install
 
 # License
-libaudec is released under the GNU LGPLv3+. See the
-file COPYING for more details. Some files, where
-specified, are licensed under different licenses.
+libaudec is released under the GNU Affero GPLv3+.
+See the file COPYING for more details. Some files,
+where specified, are licensed under different
+licenses.
 
 ----
 Copyright (C) 2019 Alexandros Theodotou
