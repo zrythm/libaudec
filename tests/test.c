@@ -19,7 +19,7 @@
 
 #include "helper.h"
 
-#include "audec.h"
+#include <audec/audec.h>
 
 int main (
   int argc, const char* argv[])

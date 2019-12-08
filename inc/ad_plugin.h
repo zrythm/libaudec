@@ -19,7 +19,7 @@
 #ifndef __AD_PLUGIN_H__
 #define __AD_PLUGIN_H__
 #include <stdint.h>
-#include "audec.h"
+#include "audec/audec.h"
 
 /** Prints a debug message. */
 #define dbg(_level, _fmt, ...) \

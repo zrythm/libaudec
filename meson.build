@@ -28,7 +28,6 @@ project (
   )
 
 srcs = []
-subdir('inc')
 subdir('src')
 
 cc = meson.get_compiler ('c')
@@ -170,6 +169,8 @@ audec = static_library (
   install: true,
 )
 
+# this is so that it can be used as a meson
+# subproject
 libaudec_dep = declare_dependency (
   include_directories: inc,
   link_with: audec)
