@@ -56,7 +56,7 @@ typedef struct {
 } ffmpeg_audio_decoder;
 
 
-static int ad_info_ffmpeg(void *sf, struct adinfo *nfo) {
+static int ad_info_ffmpeg(void *sf, AudecInfo *nfo) {
   ffmpeg_audio_decoder *priv = (ffmpeg_audio_decoder*) sf;
   if (!priv) return -1;
   if (nfo) {
@@ -92,7 +92,7 @@ static int ad_info_ffmpeg(void *sf, struct adinfo *nfo) {
   return 0;
 }
 
-static void *ad_open_ffmpeg(const char *fn, struct adinfo *nfo) {
+static void *ad_open_ffmpeg(const char *fn, AudecInfo *nfo) {
   ffmpeg_audio_decoder *priv = (ffmpeg_audio_decoder*) calloc(1, sizeof(ffmpeg_audio_decoder));
 
   priv->m_tmpBufferStart=NULL;

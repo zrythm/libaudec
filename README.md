@@ -12,9 +12,9 @@ to larger projects.
 
 # Usage
 
-Use `#include <audec/ad.h>` in your C/C++ project and
+Use `#include <audec/audec.h>` in your C/C++ project and
 add a dependency to the library using the pkg-config
-name `audec`.
+name `audec`. See the header file for API info.
 
 # Building
 

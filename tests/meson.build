@@ -15,4 +15,24 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with libaudec.  If not, see <https://www.gnu.org/licenses/>.
 
-install_headers('audec.h', subdir : 'audec')
+e = executable (
+  'test_exe', 'test.c',
+  include_directories: inc,
+  link_with: audec,
+  )
+test (
+  'wav_test', e,
+  args: [
+    join_paths (
+      meson.current_source_dir(), 'test.wav'),
+    '48000',
+    ])
+if (get_option ('enable_ffmpeg'))
+test (
+  'mp3_test', e,
+  args: [
+    join_paths (
+      meson.current_source_dir(), 'test.mp3'),
+    '48000',
+    ])
+endif

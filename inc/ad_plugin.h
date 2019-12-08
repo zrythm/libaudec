@@ -19,9 +19,14 @@
 #ifndef __AD_PLUGIN_H__
 #define __AD_PLUGIN_H__
 #include <stdint.h>
-#include "ad.h"
+#include "audec.h"
 
-#define dbg(A, B, ...) ad_debug_printf(__func__, A, B, ##__VA_ARGS__)
+/** Prints a debug message. */
+#define dbg(_level, _fmt, ...) \
+  ad_debug_printf (__func__, _level, _fmt, ##__VA_ARGS__)
+
+#define MIN(A,B) ((A) < (B) ? (A) : (B))
+#define MAX(A,B) ((A) > (B) ? (A) : (B))
 
 #ifndef __PRI64_PREFIX
 #if (defined __X86_64__ || defined __LP64__)
@@ -40,21 +45,39 @@
 
 extern int ad_debug_level;
 
-void ad_debug_printf(const char* func, int level, const char* format, ...);
+void
+ad_debug_printf (
+  const char *    func,
+  AudecDebugLevel level,
+  const char *    format,
+  ...);
 
-typedef struct {
-	int     (*eval)(const char *);
-	void *  (*open)(const char *, struct adinfo *);
-	int     (*close)(void *);
-	int     (*info)(void *, struct adinfo *);
-	int64_t (*seek)(void *, int64_t);
-	ssize_t (*read)(void *, float *, size_t);
+typedef struct ad_plugin
+{
+  int     (*eval)(const char *);
+
+  /** Opens the file. */
+  void *  (*open)(const char *, AudecInfo *);
+
+  /** Closes the file. */
+  int     (*close)(void *);
+
+  /** Fills in AudecInfo. */
+  int     (*info)(void *, AudecInfo *);
+
+  /** Moves location pointer. */
+  int64_t (*seek)(void *, int64_t);
+
+  /** Reads as many items (frames * channels) as the 3rd
+   * argument into the float array and returns the number of
+   * items read. */
+  ssize_t (*read)(void *, float *, size_t);
 } ad_plugin;
 
 int     ad_eval_null(const char *);
-void *  ad_open_null(const char *, struct adinfo *);
+void *  ad_open_null(const char *, AudecInfo *);
 int     ad_close_null(void *);
-int     ad_info_null(void *, struct adinfo *);
+int     ad_info_null(void *, AudecInfo *);
 int64_t ad_seek_null(void *, int64_t);
 ssize_t ad_read_null(void *, float*, size_t);
 

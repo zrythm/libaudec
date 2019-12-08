@@ -1,21 +1,23 @@
-/**
-   Copyright (C) 2011-2013 Robin Gareus <robin@gareus.org>
+/*
+ * Copyright (C) 2019 Alexandros Theodotou <alex at zrythm dot org>
+ * Copyright (C) 2011-2013 Robin Gareus <robin@gareus.org>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser Public License as published by
-   the Free Software Foundation; either version 2.1, or (at your option)
-   any later version.
+ * This file is part of libaudec
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser Public License for more details.
+ * libaudec is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with this library; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * libaudec is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
 
-*/
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with libaudec.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,153 +26,428 @@
 #include <unistd.h>
 #include <math.h>
 
+#include <samplerate.h>
+
 #include "ad_plugin.h"
 
-int ad_debug_level = 0;
+AudecDebugLevel ad_debug_level =
+  AUDEC_DEBUG_LEVEL_ERROR;
 
 #define UNUSED(x) (void)(x)
-
 int     ad_eval_null(const char *f) { UNUSED(f); return -1; }
-void *  ad_open_null(const char *f, struct adinfo *n) { UNUSED(f); UNUSED(n); return NULL; }
+void *  ad_open_null(const char *f, AudecInfo *n) { UNUSED(f); UNUSED(n); return NULL; }
 int     ad_close_null(void *x) { UNUSED(x); return -1; }
-int     ad_info_null(void *x, struct adinfo *n) { UNUSED(x); UNUSED(n); return -1; }
+int     ad_info_null(void *x, AudecInfo *n) { UNUSED(x); UNUSED(n); return -1; }
 int64_t ad_seek_null(void *x, int64_t p) { UNUSED(x); UNUSED(p); return -1; }
 ssize_t ad_read_null(void *x, float*d, size_t s) { UNUSED(x); UNUSED(d); UNUSED(s); return -1;}
 
-typedef struct {
-	ad_plugin const *b; ///< decoder back-end
-	void *d; ///< backend data
+
+typedef struct adecoder
+{
+  /** Decoder backend plugin. */
+  ad_plugin const * plugin;
+
+  /** Backend data, such as SF file. */
+  void *              data;
 } adecoder;
 
 /* samplecat api */
 
 void ad_init() { /* global init */ }
 
-static ad_plugin const * choose_backend(const char *fn) {
-	int max, val;
-	ad_plugin const *b=NULL;
-	max=0;
+static ad_plugin const *
+choose_backend (
+  const char * fn)
+{
+  int max, val;
+  ad_plugin const * plugin = NULL;
+  max = 0;
 
-	val=adp_get_sndfile()->eval(fn);
-	if (val>max) {max=val; b=adp_get_sndfile();}
+  val = adp_get_sndfile()->eval(fn);
+  if (val > max)
+    {
+      max = val;
+      plugin = adp_get_sndfile();
+    }
 
-	val=adp_get_ffmpeg()->eval(fn);
-	if (val>max) {max=val; b=adp_get_ffmpeg();}
+  val = adp_get_ffmpeg()->eval(fn);
+  if (val > max)
+    {
+      max = val;
+      plugin = adp_get_ffmpeg();
+    }
 
-	return b;
+  return plugin;
 }
 
-void *ad_open(const char *fn, struct adinfo *nfo) {
-	adecoder *d = (adecoder*) calloc(1, sizeof(adecoder));
-	ad_clear_nfo(nfo);
+AudecHandle *
+audec_open (
+  const char * filename,
+  AudecInfo *  nfo)
+{
+  adecoder * decoder =
+    calloc (1, sizeof (adecoder));
+  audec_clear_nfo (nfo);
 
-	d->b = choose_backend(fn);
-	if (!d->b) {
-		dbg(0, "fatal: no decoder backend available");
-		free(d);
-		return NULL;
-	}
-	d->d = d->b->open(fn, nfo);
-	if (!d->d) {
-		free(d);
-		return NULL;
-	}
-	return (void*)d;
+  decoder->plugin = choose_backend (filename);
+  if (!decoder->plugin)
+    {
+      dbg (
+        AUDEC_DEBUG_LEVEL_ERROR,
+        "fatal: no decoder backend available");
+      free(decoder);
+      return NULL;
+    }
+  decoder->data = decoder->plugin->open (filename, nfo);
+  if (!decoder->data)
+    {
+      free (decoder);
+      return NULL;
+    }
+  return (AudecHandle *) decoder;
 }
 
-int ad_info(void *sf, struct adinfo *nfo) {
-	adecoder *d = (adecoder*) sf;
-	if (!d) return -1;
-	return d->b->info(d->d, nfo);
+int
+audec_info (
+  AudecHandle * handle,
+  AudecInfo *   nfo)
+{
+  adecoder * decoder = (adecoder *) handle;
+  if (!decoder)
+    return -1;
+  return decoder->plugin->info (decoder->data, nfo);
 }
 
-int ad_close(void *sf) {
-	adecoder *d = (adecoder*) sf;
-	if (!d) return -1;
-	int rv = d->b->close(d->d);
-	free(d);
-	return rv;
+int
+audec_close (
+  AudecHandle * handle)
+{
+  adecoder * decoder = (adecoder*) handle;
+  if (!decoder)
+    return -1;
+  int ret = decoder->plugin->close (decoder->data);
+  free (decoder);
+  return ret;
 }
 
-int64_t ad_seek(void *sf, int64_t pos) {
-	adecoder *d = (adecoder*) sf;
-	if (!d) return -1;
-	return d->b->seek(d->d, pos);
+int64_t
+audec_seek (
+  AudecHandle * handle,
+  int64_t       pos)
+{
+  adecoder * decoder = (adecoder*) handle;
+  if (!decoder) return -1;
+  return decoder->plugin->seek (decoder->data, pos);
 }
 
-ssize_t ad_read(void *sf, float* out, size_t len){
-	adecoder *d = (adecoder*) sf;
-	if (!d) return -1;
-	return d->b->read(d->d, out, len);
+/**
+ * Returns the size of the buffer that must be
+ * allocated to load the file with the given
+ * sample rate.
+ */
+static ssize_t
+get_buf_size_for_sample_rate (
+  AudecInfo *  nfo,
+  unsigned int sample_rate)
+{
+  if (sample_rate == nfo->sample_rate)
+    {
+      return nfo->frames * nfo->channels;
+    }
+  else
+    {
+      double resample_ratio =
+        (1.0 * (double) sample_rate) /
+        nfo->sample_rate;
+      if (fabs (resample_ratio - 1.0) < 1e-20)
+        {
+          /* no sample rate change needed */
+          return (ssize_t) sample_rate;
+        }
+      if (src_is_valid_ratio (resample_ratio) == 0)
+        {
+          dbg (
+            AUDEC_DEBUG_LEVEL_ERROR,
+            "Sample rate change out of valid "
+            "range.");
+          return -1;
+        }
+
+      return
+        (ssize_t)
+        ((double) nfo->frames * resample_ratio *
+         (double) nfo->channels);
+    }
+}
+
+typedef struct SrcCallbackData
+{
+  float *    in_frames;
+  size_t     num_in_frames;
+} SrcCallbackData;
+
+static long
+src_cb (
+  SrcCallbackData * data,
+  float **          audio)
+{
+  *audio = &(data->in_frames[0]);
+
+  return data->num_in_frames;
+}
+
+ssize_t
+audec_read (
+  AudecHandle * handle,
+  float **      out,
+  int           sample_rate)
+{
+  adecoder *decoder = (adecoder*) handle;
+  if (!decoder)
+    return -1;
+
+  if (*out != NULL)
+    {
+      dbg (
+        AUDEC_DEBUG_LEVEL_ERROR,
+        "Please set 'out' to NULL before calling "
+        "audec_read()");
+      return -1;
+    }
+
+  /* get the info */
+  AudecInfo nfo;
+  audec_info ((AudecHandle *) decoder, &nfo);
+
+  /* read the frames */
+  size_t in_len =
+    (size_t) (nfo.frames * nfo.channels);
+  float * in = malloc (in_len * sizeof (float));
+  ssize_t ret =
+    decoder->plugin->read (
+      decoder->data, in, in_len);
+
+  /* verify that the frames were all read */
+  if (ret != (ssize_t) in_len)
+    {
+      dbg (
+        AUDEC_DEBUG_LEVEL_ERROR,
+        "Number of read in frames %ld not equal to "
+        "given buf size %ld",
+        ret, in_len);
+      free (in);
+      return -1;
+    }
+
+  /* resample if required */
+  if (sample_rate > 0 &&
+      sample_rate != (int) nfo.sample_rate)
+    {
+      ssize_t out_buf_size =
+        get_buf_size_for_sample_rate (
+          &nfo, (unsigned int) sample_rate);
+      if (out_buf_size < 0)
+        {
+          free (in);
+          return -1;
+        }
+      else
+        {
+          int err;
+          SrcCallbackData data = {
+            .in_frames = in,
+            .num_in_frames = nfo.frames,
+          };
+          SRC_STATE * state =
+            src_callback_new (
+              (src_callback_t) src_cb,
+              SRC_SINC_BEST_QUALITY,
+              (int) nfo.channels, &err, &data);
+          if (!state)
+            {
+              dbg (
+                AUDEC_DEBUG_LEVEL_ERROR,
+                "Failed to create a src callback: "
+                "%s", src_strerror (err));
+              free (in);
+              return -1;
+            }
+
+          double resample_ratio =
+            (1.0 * (double) sample_rate) /
+            nfo.sample_rate;
+          *out =
+            malloc (
+              (size_t) out_buf_size *
+              sizeof (float));
+
+          /* start reading */
+          ssize_t frames_read = -1;
+          ssize_t total_read = 0;
+          ssize_t frames_to_read = 0;
+          ssize_t num_out_frames =
+            (out_buf_size / (ssize_t) nfo.channels);
+          do
+            {
+              frames_to_read =
+                MIN (
+                  6000,
+                  num_out_frames - total_read);
+              frames_read =
+                src_callback_read (
+                  state, resample_ratio,
+                  frames_to_read,
+                  &((*out)[total_read * nfo.channels]));
+
+              /* handle errors */
+              int err_ret =
+                src_error (state);
+              if (err_ret)
+                {
+                  dbg (
+                    AUDEC_DEBUG_LEVEL_ERROR,
+                    "An error occurred during "
+                    "resampling: %s",
+                    src_strerror (err_ret));
+                  src_delete (state);
+                  free (in);
+                  free (*out);
+                  *out = NULL;
+                  return -1;
+                }
+
+              total_read += frames_read;
+
+              if (frames_read == -1)
+                break;
+
+            } while (frames_read > 0);
+          src_delete (state);
+
+          if (total_read != num_out_frames)
+            {
+              dbg (
+                AUDEC_DEBUG_LEVEL_INFO,
+                "Total frames read (%ld) and out "
+                "frames expected (%ld) do not match",
+                total_read, num_out_frames);
+            }
+          if (frames_read == -1)
+            {
+              dbg (
+                AUDEC_DEBUG_LEVEL_ERROR,
+                "An error has occurred in "
+                "resampling: frames read == -1");
+              free (in);
+              free (*out);
+              *out = NULL;
+              return -1;
+            }
+          ret = total_read * (ssize_t) nfo.channels;
+        }
+    }
+  else
+    {
+      *out =
+        malloc (in_len * sizeof (float));
+      memcpy (*out, in, in_len * sizeof (float));
+      ret = in_len;
+    }
+
+  return ret;
 }
 
 /*
  *  side-effects: allocates buffer
  */
-ssize_t ad_read_mono_dbl(void *sf, struct adinfo *nfo, double* d, size_t len){
-	unsigned int c,f;
-	unsigned int chn = nfo->channels;
-	if (len<1) return 0;
+ssize_t
+audec_read_mono_dbl (
+  void *      sf,
+  AudecInfo * nfo,
+  double *    d,
+  size_t      len,
+  int         sample_rate)
+{
+  unsigned int c,f;
+  unsigned int chn = nfo->channels;
+  if (len<1) return 0;
 
-	static float *buf = NULL;
-	static size_t bufsiz = 0;
-	if (!buf || bufsiz != len*chn) {
-		bufsiz=len*chn;
-		buf = (float*) realloc((void*)buf, bufsiz * sizeof(float));
-	}
+  static float *buf = NULL;
 
-	len = ad_read(sf, buf, bufsiz);
+  len = audec_read (sf, &buf, sample_rate);
 
-	for (f=0;f< (len/chn);f++) {
-		double val=0.0;
-		for (c=0;c<chn;c++) {
-			val+=buf[f*chn + c];
-		}
-		d[f]= val/chn;
-	}
-	return len/chn;
-}
-
-
-int ad_finfo (const char *fn, struct adinfo *nfo) {
-	ad_clear_nfo(nfo);
-	void * sf = ad_open(fn, nfo);
-	return ad_close(sf)?1:0;
-}
-
-void ad_clear_nfo(struct adinfo *nfo) {
-	memset(nfo, 0, sizeof(struct adinfo));
-}
-
-void ad_free_nfo(struct adinfo *nfo) {
-	if (nfo->meta_data) free(nfo->meta_data);
-}
-
-void ad_dump_nfo(int dbglvl, struct adinfo *nfo) {
-	dbg(dbglvl, "sample_rate: %u", nfo->sample_rate);
-	dbg(dbglvl, "channels:    %u", nfo->channels);
-	dbg(dbglvl, "length:      %"PRIi64" ms", nfo->length);
-	dbg(dbglvl, "frames:      %"PRIi64, nfo->frames);
-	dbg(dbglvl, "bit_rate:    %d", nfo->bit_rate);
-	dbg(dbglvl, "bit_depth:   %d", nfo->bit_depth);
-	dbg(dbglvl, "channels:    %u", nfo->channels);
-	dbg(dbglvl, "meta-data:   %s", nfo->meta_data?nfo->meta_data:"-");
-}
-
-void ad_debug_printf(const char* func, int level, const char* format, ...) {
-    va_list args;
-
-    va_start(args, format);
-    if (level <= ad_debug_level) {
-        fprintf(stderr, "%s(): ", func);
-        vfprintf(stderr, format, args);
-        fprintf(stderr, "\n");
+  for (f=0;f< (len/chn);f++) {
+    double val=0.0;
+    for (c=0;c<chn;c++) {
+      val+=buf[f*chn + c];
     }
-    va_end(args);
+    d[f]= val/chn;
+  }
+  return len/chn;
 }
 
-void ad_set_debuglevel(int lvl) {
-	ad_debug_level = lvl;
-	if (ad_debug_level<-1) ad_debug_level=-1;
-	if (ad_debug_level>3) ad_debug_level=3;
+
+int
+audec_finfo (
+  const char * filename, AudecInfo *nfo)
+{
+  audec_clear_nfo (nfo);
+  void * sf = audec_open (filename, nfo);
+  return audec_close(sf) ? 1 : 0;
+}
+
+void
+audec_clear_nfo (
+  AudecInfo *nfo)
+{
+  memset (nfo, 0, sizeof (AudecInfo));
+}
+
+void
+audec_free_nfo (
+  AudecInfo *nfo)
+{
+  if (nfo->meta_data)
+    free (nfo->meta_data);
+}
+
+void
+audec_dump_nfo (
+  AudecDebugLevel dbglvl,
+  AudecInfo *     nfo)
+{
+  dbg(dbglvl, "sample_rate: %u", nfo->sample_rate);
+  dbg(dbglvl, "channels:    %u", nfo->channels);
+  dbg(dbglvl, "length:      %"PRIi64" ms", nfo->length);
+  dbg(dbglvl, "frames:      %"PRIi64, nfo->frames);
+  dbg(dbglvl, "bit_rate:    %d", nfo->bit_rate);
+  dbg(dbglvl, "bit_depth:   %d", nfo->bit_depth);
+  dbg(dbglvl, "channels:    %u", nfo->channels);
+  dbg(dbglvl, "meta-data:   %s", nfo->meta_data?nfo->meta_data:"-");
+}
+
+void
+ad_debug_printf (
+  const char *    func,
+  AudecDebugLevel level,
+  const char *    format,
+  ...)
+{
+  va_list args;
+
+  va_start (args, format);
+  if (level <= ad_debug_level)
+    {
+      fprintf (stderr, "%s(): ", func);
+      vfprintf (stderr, format, args);
+      fprintf (stderr, "\n");
+    }
+  va_end (args);
+}
+
+void
+audec_set_debug_level (
+  AudecDebugLevel lvl)
+{
+  ad_debug_level = lvl;
 }
