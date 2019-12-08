@@ -23,9 +23,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ad_printf(a,...) \
-  fprintf (stderr , a, ##__VA_ARGS__)
+  fprintf (stderr , a "\n", ##__VA_ARGS__)
 
 #define ad_assert(x) \
   if (!(x)) \
@@ -33,5 +34,19 @@
       ad_printf("Assertion failed: %s", #x); \
       exit(1); \
     }
+
+int
+str_endswith (
+  const char *s, const char *t)
+{
+  size_t ls = strlen(s); // find length of s
+  size_t lt = strlen(t); // find length of t
+  if (ls >= lt)  // check if t can fit in s
+  {
+      // point s to where t should start and compare the strings from there
+      return (0 == memcmp(t, s + (ls - lt), lt));
+  }
+  return 0; // t was longer than s
+}
 
 #endif

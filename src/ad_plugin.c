@@ -157,8 +157,7 @@ get_buf_size_for_sample_rate (
   else
     {
       double resample_ratio =
-        (1.0 * (double) sample_rate) /
-        nfo->sample_rate;
+        (double) sample_rate / nfo->sample_rate;
       if (fabs (resample_ratio - 1.0) < 1e-20)
         {
           /* no sample rate change needed */
@@ -323,6 +322,7 @@ audec_read (
 
             } while (frames_read > 0);
           src_delete (state);
+          free (in);
 
           if (total_read != num_out_frames)
             {
@@ -338,7 +338,6 @@ audec_read (
                 AUDEC_DEBUG_LEVEL_ERROR,
                 "An error has occurred in "
                 "resampling: frames read == -1");
-              free (in);
               free (*out);
               *out = NULL;
               return -1;
@@ -351,7 +350,7 @@ audec_read (
       *out =
         malloc (in_len * sizeof (float));
       memcpy (*out, in, in_len * sizeof (float));
-      ret = in_len / (ssize_t) nfo.channels;
+      ret = nfo.frames;
     }
 
   return ret;
