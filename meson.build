@@ -167,7 +167,7 @@ audec = static_library (
     audec_deps,
     ],
   include_directories: inc,
-  install: true,
+  install: not meson.is_subproject(),
 )
 
 # this is so that it can be used as a meson

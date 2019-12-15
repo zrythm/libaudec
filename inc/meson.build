@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with libaudec.  If not, see <https://www.gnu.org/licenses/>.
 
+if not meson.is_subproject()
 install_headers (
   join_paths ('audec', 'audec.h'),
   subdir: 'audec')
+endif
