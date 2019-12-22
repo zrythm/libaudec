@@ -176,14 +176,16 @@ libaudec_dep = declare_dependency (
   include_directories: inc,
   link_with: audec)
 
-pkg_mod = import('pkgconfig')
-pkg_mod.generate(
-  libraries: audec,
-  version: '0.1',
-  name: 'audec',
-  filebase: 'audec',
-  description: 'A library to read and resample audio files.',
-  )
+if not meson.is_subproject()
+  pkg_mod = import('pkgconfig')
+  pkg_mod.generate(
+    libraries: audec,
+    version: '0.1',
+    name: 'audec',
+    filebase: 'audec',
+    description: 'A library to read and resample audio files.',
+    )
+endif
 
 subdir('tests')
 
