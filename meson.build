@@ -57,12 +57,15 @@ cdata.set_quoted (
 os_darwin = false
 os_linux = false
 os_freebsd = false
+os_windows = false
 if host_machine.system() == 'darwin'
   os_darwin = true
 elif host_machine.system() == 'linux'
   os_linux = true
 elif host_machine.system() == 'freebsd'
   os_freebsd = true
+elif host_machine.system() == 'windows'
+  os_windows = true
 endif
 
 inc = [
@@ -130,6 +133,11 @@ audec_cflags = [
   '-Werror=type-limits',
   '-Werror=deprecated-declarations',
   ]
+if os_windows
+  audec_cflags += [
+    '-D_WOE32=1',
+    ]
+endif
 audec_cflags = cc.get_supported_arguments (
   audec_cflags)
 

@@ -47,9 +47,10 @@ int main (
       expected_channels_before = 2;
     }
   size_t expected_frames_after =
-    (double) expected_frames_before *
+    (size_t)
+    ((double) expected_frames_before *
     ((double) sample_rate /
-     expected_sample_rate_before);
+     expected_sample_rate_before));
 
   audec_init ();
 

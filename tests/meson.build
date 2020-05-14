@@ -19,6 +19,7 @@ e = executable (
   'test_exe', 'test.c',
   include_directories: inc,
   link_with: audec,
+  c_args: audec_cflags,
   )
 test (
   'wav_test', e,

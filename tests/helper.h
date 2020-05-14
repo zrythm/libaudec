@@ -29,6 +29,14 @@
 #define ad_printf(a,...) \
   fprintf (stderr , a "\n", ##__VA_ARGS__)
 
+#ifdef _WOE32
+#define ad_assert(x) \
+  if (!(x)) \
+    { \
+      ad_printf("Assertion failed: %s", #x); \
+      exit(1); \
+    }
+#else
 #define ad_assert(x) \
   if (!(x)) \
     { \
@@ -36,8 +44,9 @@
       raise (SIGTRAP); \
       exit(1); \
     }
+#endif
 
-int
+static inline int
 str_endswith (
   const char *s, const char *t)
 {
