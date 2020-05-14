@@ -19,7 +19,7 @@ project (
   'libaudec', ['c'],
   version: '0.1.0',
   license: 'AGPLv3+',
-  meson_version: '>= 0.46.0',
+  meson_version: '>= 0.47.0',
   default_options: [
     'warning_level=2',
     'buildtype=debug',
@@ -134,10 +134,19 @@ audec_cflags = cc.get_supported_arguments (
   audec_cflags)
 
 audec_deps = []
-if (get_option('enable_ffmpeg'))
-  audec_deps += dependency('libavcodec')
-  audec_deps += dependency('libavformat')
-  audec_deps += dependency('libavutil')
+libavcodec_dep = dependency (
+  'libavcodec', required: get_option ('ffmpeg'))
+libavformat_dep = dependency (
+  'libavformat', required: get_option ('ffmpeg'))
+libavutil_dep = dependency (
+  'libavutil', required: get_option ('ffmpeg'))
+audec_deps += [
+  libavcodec_dep,
+  libavformat_dep,
+  libavutil_dep,
+  ]
+have_ffmpeg = libavcodec_dep.found () and libavformat_dep.found () and libavutil_dep.found () and not get_option ('ffmpeg').disabled ()
+if have_ffmpeg
   cdata.set('HAVE_FFMPEG', 1)
 endif
 
@@ -174,6 +183,7 @@ audec = static_library (
 # subproject
 libaudec_dep = declare_dependency (
   include_directories: inc,
+  dependencies: audec_deps,
   link_with: audec)
 
 if not meson.is_subproject()
@@ -187,6 +197,12 @@ if not meson.is_subproject()
     )
 endif
 
+audec_exe = executable (
+  'audec',
+  'src/main.c',
+  dependencies: libaudec_dep,
+  )
+
 subdir('tests')
 
 summary = [
@@ -197,7 +213,7 @@ summary = [
   '  Build type: @0@'.format(
     get_option('buildtype')),
   '  Optional libraries:',
-  '    ffmpeg: @0@'.format(get_option('enable_ffmpeg')),
+  '    ffmpeg: @0@'.format(have_ffmpeg),
   '  Directories:',
   '            prefix: @0@'.format(prefix),
   '        includedir: @0@'.format(includedir),

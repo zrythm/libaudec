@@ -249,8 +249,17 @@ audec_read (
   if (ret != (ssize_t) in_len)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_DEBUG_LEVEL_DEBUG,
         "Number of read in frames %ld not equal to "
+        "given buf size %ld",
+        ret, in_len);
+    }
+
+  if (ret > (ssize_t) in_len)
+    {
+      dbg (
+        AUDEC_DEBUG_LEVEL_ERROR,
+        "Number of read in frames %ld greater than "
         "given buf size %ld",
         ret, in_len);
       free (in);
@@ -378,8 +387,8 @@ audec_read (
       dbg (
         AUDEC_DEBUG_LEVEL_INFO,
         "No resampling done, returning %ld frames "
-        "(out buffer size %lu)",
-        nfo.frames, in_len);
+        "(out buffer size %zu)",
+        nfo.frames, ret);
     }
 
   return ret;

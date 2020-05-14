@@ -25,9 +25,9 @@ test (
   args: [
     join_paths (
       meson.current_source_dir(), 'test.wav'),
-    '48000',
+    '44000',
     ])
-if (get_option ('enable_ffmpeg'))
+if have_ffmpeg
 test (
   'mp3_test', e,
   args: [

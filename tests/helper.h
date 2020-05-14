@@ -21,6 +21,7 @@
 #define __AD_TESTS_HELPER_H__
 
 #include <math.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +33,7 @@
   if (!(x)) \
     { \
       ad_printf("Assertion failed: %s", #x); \
+      raise (SIGTRAP); \
       exit(1); \
     }
 

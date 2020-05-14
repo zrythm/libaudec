@@ -34,8 +34,8 @@ int main (
   unsigned int expected_channels_before = 0;
   if (str_endswith (filename, "test.wav"))
     {
-      expected_frames_before = 291583;
-      expected_sample_rate_before = 44100;
+      expected_frames_before = 164571;
+      expected_sample_rate_before = 48000;
       expected_channels_before = 2;
     }
   else if (str_endswith (filename, "test.mp3"))
