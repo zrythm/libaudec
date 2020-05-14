@@ -201,6 +201,7 @@ audec_exe = executable (
   'audec',
   'src/main.c',
   dependencies: libaudec_dep,
+  install: not meson.is_subproject(),
   )
 
 subdir('tests')
