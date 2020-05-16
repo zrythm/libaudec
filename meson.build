@@ -17,7 +17,7 @@
 
 project (
   'libaudec', ['c'],
-  version: '0.2.1',
+  version: '0.2.2',
   license: 'AGPLv3+',
   meson_version: '>= 0.47.0',
   default_options: [
@@ -198,7 +198,7 @@ if not meson.is_subproject()
   pkg_mod = import('pkgconfig')
   pkg_mod.generate(
     libraries: audec,
-    version: '0.1',
+    version: meson.project_version (),
     name: 'audec',
     filebase: 'audec',
     description: 'A library to read and resample audio files.',
