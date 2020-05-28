@@ -29,13 +29,13 @@ if get_option ('tests')
         meson.current_source_dir(), 'test.wav'),
       '44000',
       ])
-  if have_ffmpeg
-  test (
-    'mp3_test', e,
-    args: [
-      join_paths (
-        meson.current_source_dir(), 'test.mp3'),
-      '48000',
-      ])
+  if have_ffmpeg and get_option ('mp3_tests')
+    test (
+      'mp3_test', e,
+      args: [
+        join_paths (
+          meson.current_source_dir(), 'test.mp3'),
+        '48000',
+        ])
   endif
 endif

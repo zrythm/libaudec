@@ -28,3 +28,9 @@ option (
   value: true,
   yield: true,
   description: 'Compile tests')
+
+option (
+  'mp3_tests',
+  type: 'boolean',
+  value: false,
+  description: 'Compile mp3 tests')
