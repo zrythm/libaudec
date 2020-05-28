@@ -21,3 +21,10 @@ option (
   value: 'disabled',
   yield: true,
   description: 'Compile with ffmpeg (for MP3 support)')
+
+option (
+  'tests',
+  type: 'boolean',
+  value: true,
+  yield: true,
+  description: 'Compile tests')

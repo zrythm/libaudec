@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Alexandros Theodotou <alex at zrythm dot org>
+ * Copyright (C) 2019-2020 Alexandros Theodotou <alex at zrythm dot org>
  *
  * This file is part of libaudec
  *
@@ -36,6 +36,8 @@
  */
 
 #include "config.h"
+
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -250,8 +252,8 @@ audec_read (
     {
       dbg (
         AUDEC_DEBUG_LEVEL_DEBUG,
-        "Number of read in frames %ld not equal to "
-        "given buf size %ld",
+        "Number of read in frames %zu not equal to "
+        "given buf size %zd",
         ret, in_len);
     }
 
@@ -259,8 +261,8 @@ audec_read (
     {
       dbg (
         AUDEC_DEBUG_LEVEL_ERROR,
-        "Number of read in frames %ld greater than "
-        "given buf size %ld",
+        "Number of read in frames %zu greater than "
+        "given buf size %zd",
         ret, in_len);
       free (in);
       return -1;
@@ -356,8 +358,8 @@ audec_read (
             {
               dbg (
                 AUDEC_DEBUG_LEVEL_INFO,
-                "Total frames read (%ld) and out "
-                "frames expected (%ld) do not match",
+                "Total frames read (%zu) and out "
+                "frames expected (%zu) do not match",
                 total_read, num_out_frames);
             }
           if (frames_read == -1)
@@ -374,8 +376,8 @@ audec_read (
 
           dbg (
             AUDEC_DEBUG_LEVEL_INFO,
-            "%ld frames read after resampling "
-            "(out buffer size %lu)",
+            "%zu frames read after resampling "
+            "(out buffer size %zu)",
             total_read, out_buf_size);
         }
     }
@@ -386,7 +388,7 @@ audec_read (
 
       dbg (
         AUDEC_DEBUG_LEVEL_INFO,
-        "No resampling done, returning %ld frames "
+        "No resampling done, returning %" PRIi64 " frames "
         "(out buffer size %zu)",
         nfo.frames, ret);
     }

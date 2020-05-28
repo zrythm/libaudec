@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Alexandros Theodotou <alex at zrythm dot org>
+# Copyright (C) 2019-2020 Alexandros Theodotou <alex at zrythm dot org>
 #
 # This file is part of libaudec
 #
@@ -15,25 +15,27 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with libaudec.  If not, see <https://www.gnu.org/licenses/>.
 
-e = executable (
-  'test_exe', 'test.c',
-  include_directories: inc,
-  link_with: audec,
-  c_args: audec_cflags,
-  )
-test (
-  'wav_test', e,
-  args: [
-    join_paths (
-      meson.current_source_dir(), 'test.wav'),
-    '44000',
-    ])
-if have_ffmpeg
-test (
-  'mp3_test', e,
-  args: [
-    join_paths (
-      meson.current_source_dir(), 'test.mp3'),
-    '48000',
-    ])
+if get_option ('tests')
+  e = executable (
+    'test_exe', 'test.c',
+    include_directories: inc,
+    link_with: audec,
+    c_args: audec_cflags,
+    )
+  test (
+    'wav_test', e,
+    args: [
+      join_paths (
+        meson.current_source_dir(), 'test.wav'),
+      '44000',
+      ])
+  if have_ffmpeg
+  test (
+    'mp3_test', e,
+    args: [
+      join_paths (
+        meson.current_source_dir(), 'test.mp3'),
+      '48000',
+      ])
+  endif
 endif

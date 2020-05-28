@@ -70,7 +70,7 @@ int main (
   ssize_t samples_read =
     audec_read (
       handle, &out_frames, sample_rate);
-  ad_printf ("samples read %ld", samples_read);
+  ad_printf ("samples read %zd", samples_read);
   ad_assert (
     samples_read > 0);
   ad_assert (
