@@ -35,7 +35,8 @@
 typedef struct {
   AVFormatContext* formatContext;
   AVCodecContext*  codecContext;
-  AVCodec*         codec;
+  AVCodecParameters * codecpar;
+  AVCodec * codec;
   AVPacket         packet;
   int              audioStream;
   int              pkt_len;
@@ -90,41 +91,50 @@ static int ad_info_ffmpeg(void *sf, AudecInfo *nfo) {
   return 0;
 }
 
-static void *ad_open_ffmpeg(const char *fn, AudecInfo *nfo) {
-  ffmpeg_audio_decoder *priv = (ffmpeg_audio_decoder*) calloc(1, sizeof(ffmpeg_audio_decoder));
+static void * ad_open_ffmpeg(const char *fn, AudecInfo *nfo)
+{
+  ffmpeg_audio_decoder *priv =
+    (ffmpeg_audio_decoder*) calloc (1, sizeof(ffmpeg_audio_decoder));
 
   priv->m_tmpBufferStart=NULL;
   priv->m_tmpBufferLen=0;
   priv->decoder_clock=priv->output_clock=priv->seek_frame=0;
   priv->packet.size=0; priv->packet.data=NULL;
 
-  if (avformat_open_input(&priv->formatContext, fn, NULL, NULL) <0) {
-    dbg(0, "ffmpeg is unable to open file '%s'.", fn);
-    free(priv); return(NULL);
-  }
+  if (avformat_open_input(&priv->formatContext, fn, NULL, NULL) <0)
+    {
+      dbg (
+        AUDEC_DEBUG_LEVEL_ERROR, "ffmpeg is unable to open file '%s'.", fn);
+      free (priv);
+      return NULL;
+    }
 
-  if (avformat_find_stream_info(priv->formatContext, NULL) < 0) {
-    avformat_close_input(&priv->formatContext);
-    dbg(0, "av_find_stream_info failed" );
-    free(priv); return(NULL);
-  }
+  if (avformat_find_stream_info(priv->formatContext, NULL) < 0)
+    {
+      avformat_close_input (&priv->formatContext);
+      dbg (AUDEC_DEBUG_LEVEL_ERROR, "av_find_stream_info failed");
+      free(priv); return(NULL);
+    }
 
   priv->audioStream = -1;
   unsigned int i;
-  for (i=0; i<priv->formatContext->nb_streams; i++) {
-    if (priv->formatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-      priv->audioStream = i;
-      break;
+  for (i=0; i<priv->formatContext->nb_streams; i++)
+    {
+      if (avcodec_find_encoder (
+            priv->formatContext->streams[i]->codecpar->codec_id)->type == AVMEDIA_TYPE_AUDIO)
+        {
+          priv->audioStream = i;
+          break;
+        }
     }
-  }
   if (priv->audioStream == -1) {
     dbg(0, "No Audio Stream found in file");
     avformat_close_input(&priv->formatContext);
     free(priv); return(NULL);
   }
 
-  priv->codecContext = priv->formatContext->streams[priv->audioStream]->codec;
-  priv->codec        = avcodec_find_decoder(priv->codecContext->codec_id);
+  priv->codecpar = priv->formatContext->streams[priv->audioStream]->codecpar;
+  priv->codec = avcodec_find_decoder(priv->codecContext->codec_id);
 
   if (priv->codec == NULL) {
     avformat_close_input(&priv->formatContext);
@@ -199,13 +209,17 @@ static ssize_t ad_read_ffmpeg(void *sf, float* d, size_t len) {
       priv->m_tmpBufferStart = priv->m_tmpBuffer;
       priv->m_tmpBufferLen = 0;
 
-      if (!priv->pkt_ptr || priv->pkt_len <1 ) {
-        if (priv->packet.data) av_free_packet(&priv->packet);
-        ret = av_read_frame(priv->formatContext, &priv->packet);
-        if (ret<0) { dbg(1, "reached end of file."); break; }
-        priv->pkt_len = priv->packet.size;
-        priv->pkt_ptr = priv->packet.data;
-      }
+      if (!priv->pkt_ptr || priv->pkt_len <1 )
+        {
+          if (priv->packet.data)
+            {
+              av_packet_unref (&priv->packet);
+            }
+          ret = av_read_frame(priv->formatContext, &priv->packet);
+          if (ret<0) { dbg(1, "reached end of file."); break; }
+          priv->pkt_len = priv->packet.size;
+          priv->pkt_ptr = priv->packet.data;
+        }
 
       if (priv->packet.stream_index != priv->audioStream) {
         priv->pkt_ptr = NULL;
@@ -254,8 +268,8 @@ static ssize_t ad_read_ffmpeg(void *sf, float* d, size_t len) {
         dbg(0, "audio decode error");
         return -1;
 #endif
-        priv->pkt_len=0;
-        ret=0;
+        priv->pkt_len = 0;
+        ret = 0;
         continue;
       }
 
@@ -375,8 +389,10 @@ const ad_plugin * adp_get_ffmpeg() {
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53, 5, 0)
     avcodec_init();
 #endif
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     av_register_all();
     avcodec_register_all();
+#endif
     if(ad_debug_level <= 1)
       av_log_set_level(AV_LOG_QUIET);
     else
