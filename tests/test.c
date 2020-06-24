@@ -64,6 +64,8 @@ int main (
     expected_frames_before == (size_t) nfo.frames);
   ad_assert (
     expected_channels_before == nfo.channels);
+  /* TODO ACIDize .wav and read bpm */
+  ad_assert (-1.f < nfo.bpm && 1.f > nfo.bpm);
 
   /* read frames */
   float * out_frames = NULL;

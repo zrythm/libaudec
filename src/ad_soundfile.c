@@ -71,6 +71,11 @@ ad_info_sndfile (
       nfo->bit_rate =
         nfo->bit_depth * nfo->channels * nfo->sample_rate;
       nfo->meta_data = NULL;
+
+      SF_LOOP_INFO loop;
+      sf_command (
+        priv->sffile, SFC_GET_LOOP_INFO, &loop, sizeof (loop));
+      nfo->bpm = loop.bpm;
     }
   return 0;
 }

@@ -63,6 +63,9 @@ typedef struct AudecInfo
   int           bit_depth;
   char *        meta_data;
 
+  /** BPM, or 0. */
+  float         bpm;
+
   /** A handle used in various operations. */
   AudecHandle * handle;
 } AudecInfo;
