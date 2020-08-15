@@ -142,21 +142,22 @@ audec_cflags = cc.get_supported_arguments (
   audec_cflags)
 
 audec_deps = []
-libavcodec_dep = dependency (
-  'libavcodec', required: get_option ('ffmpeg'))
-libavformat_dep = dependency (
-  'libavformat', required: get_option ('ffmpeg'))
-libavutil_dep = dependency (
-  'libavutil', required: get_option ('ffmpeg'))
-audec_deps += [
-  libavcodec_dep,
-  libavformat_dep,
-  libavutil_dep,
-  ]
-have_ffmpeg = libavcodec_dep.found () and libavformat_dep.found () and libavutil_dep.found () and not get_option ('ffmpeg').disabled ()
-if have_ffmpeg
-  cdata.set('HAVE_FFMPEG', 1)
-endif
+#libavcodec_dep = dependency (
+  #'libavcodec', required: get_option ('ffmpeg'))
+#libavformat_dep = dependency (
+  #'libavformat', required: get_option ('ffmpeg'))
+#libavutil_dep = dependency (
+  #'libavutil', required: get_option ('ffmpeg'))
+#audec_deps += [
+  #libavcodec_dep,
+  #libavformat_dep,
+  #libavutil_dep,
+  #]
+#have_ffmpeg = libavcodec_dep.found () and libavformat_dep.found () and libavutil_dep.found () and not get_option ('ffmpeg').disabled ()
+#if have_ffmpeg
+  #cdata.set('HAVE_FFMPEG', 1)
+#endif
+have_ffmpeg = false
 
 audec_deps += [
   dependency('sndfile', version: '>=1.0.25'),
@@ -221,8 +222,6 @@ summary = [
   '',
   '  Build type: @0@'.format(
     get_option('buildtype')),
-  '  Optional libraries:',
-  '    ffmpeg: @0@'.format(have_ffmpeg),
   '  Directories:',
   '            prefix: @0@'.format(prefix),
   '        includedir: @0@'.format(includedir),

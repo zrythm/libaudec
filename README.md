@@ -2,7 +2,7 @@ libaudec
 ========
 
 libaudec (lib audio decoder) is a wrapper library
-over ffmpeg, sndfile and libsamplerate for reading
+over minimp3, sndfile and libsamplerate for reading
 and resampling audio files, based on Robin Gareus'
 `audio_decoder` code
 (https://github.com/x42/silan/tree/master/audio_decoder)
@@ -63,7 +63,7 @@ where specified, are licensed under different
 licenses.
 
 ----
-Copyright (C) 2019 Alexandros Theodotou
+Copyright (C) 2019-2020 Alexandros Theodotou
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright

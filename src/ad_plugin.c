@@ -89,11 +89,20 @@ choose_backend (
       plugin = adp_get_sndfile();
     }
 
+#if 0
   val = adp_get_ffmpeg()->eval(fn);
   if (val > max)
     {
       max = val;
       plugin = adp_get_ffmpeg();
+    }
+#endif
+
+  val = adp_get_minimp3()->eval(fn);
+  if (val > max)
+    {
+      max = val;
+      plugin = adp_get_minimp3();
     }
 
   return plugin;

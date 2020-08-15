@@ -42,7 +42,7 @@ int main (
     {
       /*expected_frames_before = 294912;*/
       /* FIXME audacity says above */
-      expected_frames_before = 292654;
+      expected_frames_before = 291583;
       expected_sample_rate_before = 44100;
       expected_channels_before = 2;
     }

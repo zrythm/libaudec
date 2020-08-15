@@ -17,6 +17,7 @@
 
 srcs = files ([
   'ad_soundfile.c',
-  'ad_ffmpeg.c',
+  #'ad_ffmpeg.c',
+  'ad_minimp3.c',
   'ad_plugin.c',
   ])
