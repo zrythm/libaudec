@@ -16,21 +16,8 @@
 # along with libaudec.  If not, see <https://www.gnu.org/licenses/>.
 
 option (
-  'ffmpeg',
-  type: 'feature',
-  value: 'disabled',
-  yield: true,
-  description: 'Compile with ffmpeg (for MP3 support)')
-
-option (
   'tests',
   type: 'boolean',
   value: true,
   yield: true,
   description: 'Compile tests')
-
-option (
-  'mp3_tests',
-  type: 'boolean',
-  value: false,
-  description: 'Compile mp3 tests')

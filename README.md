@@ -7,6 +7,9 @@ and resampling audio files, based on Robin Gareus'
 `audio_decoder` code
 (https://github.com/x42/silan/tree/master/audio_decoder)
 
+libaudec supports all formats supported by sndfile,
+in addition to MP3.
+
 This library is meant to be linked in statically
 to larger projects.
 
