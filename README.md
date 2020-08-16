@@ -1,6 +1,8 @@
 libaudec
 ========
 
+[![builds.sr.ht status](https://builds.sr.ht/~alextee/zrythm.svg)](https://builds.sr.ht/~alextee/libaudec?)
+
 libaudec (lib audio decoder) is a wrapper library
 over minimp3, sndfile and libsamplerate for reading
 and resampling audio files, based on Robin Gareus'
