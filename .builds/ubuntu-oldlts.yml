@@ -18,8 +18,6 @@ tasks:
   - test: |
       cd libaudec
       ninja -C build test
-      ninja -C build coverage-text
-      cat build/meson-logs/coverage.txt
   - install: |
       cd libaudec
       DESTDIR=/tmp ninja -C build install

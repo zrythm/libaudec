@@ -14,7 +14,7 @@ sources:
 tasks:
   - setup: |
       cd libaudec
-      ../meson/meson.py build -Dtests=true
+      ../meson/meson.py build -Dtests=true -Db_coverage=true
   - build: |
       cd libaudec
       ninja -C build

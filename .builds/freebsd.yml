@@ -9,11 +9,10 @@ packages:
   - libsndfile
 sources:
   - https://git.sr.ht/~alextee/libaudec
-  - https://github.com/mesonbuild/meson
 tasks:
   - setup: |
       cd libaudec
-      CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib ../meson/meson.py build -Dtests=true
+      CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib meson build -Dtests=true
   - build: |
       cd libaudec
       ninja -C build
