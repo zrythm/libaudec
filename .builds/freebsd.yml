@@ -1,0 +1,25 @@
+image: freebsd/latest
+packages:
+  - meson
+  - ninja
+  - chromaprint
+  - python36
+  - pkgconf
+  - libsamplerate
+  - libsndfile
+sources:
+  - https://git.sr.ht/~alextee/libaudec
+  - https://github.com/mesonbuild/meson
+tasks:
+  - setup: |
+      cd libaudec
+      CFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib ../meson/meson.py build -Dtests=true
+  - build: |
+      cd libaudec
+      ninja -C build
+  - test: |
+      cd libaudec
+      ninja -C build test
+  - install: |
+      cd libaudec
+      DESTDIR=/tmp ninja -C build install

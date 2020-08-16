@@ -1,0 +1,25 @@
+image: ubuntu/lts # latest xx.04
+packages:
+  - libsndfile1-dev
+  - ninja-build
+  - libchromaprint-dev
+  - libsamplerate0-dev
+  - python3
+sources:
+  - https://git.sr.ht/~alextee/libaudec
+  - https://github.com/mesonbuild/meson
+tasks:
+  - setup: |
+      cd libaudec
+      ../meson/meson.py build -Dtests=true
+  - build: |
+      cd libaudec
+      ninja -C build
+  - test: |
+      cd libaudec
+      ninja -C build test
+      ninja -C build coverage-text
+      cat build/meson-logs/coverage.txt
+  - install: |
+      cd libaudec
+      DESTDIR=/tmp ninja -C build install
