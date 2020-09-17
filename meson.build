@@ -19,13 +19,17 @@ project (
   'libaudec', ['c'],
   version: '0.2.3',
   license: 'AGPLv3+',
-  meson_version: '>= 0.47.0',
+  meson_version: '>= 0.55.0',
   default_options: [
     'warning_level=2',
     'buildtype=debug',
     'c_std=gnu11',
     ],
   )
+
+cmake = import ('cmake')
+cmake_opts = cmake.subproject_options ()
+cmake_opts.add_cmake_defines ({'CMAKE_POSITION_INDEPENDENT_CODE': 'ON'})
 
 srcs = []
 subdir('inc')
@@ -141,11 +145,26 @@ endif
 audec_cflags = cc.get_supported_arguments (
   audec_cflags)
 
-audec_deps = []
+samplerate_dep = dependency (
+  'samplerate', version: '>=0.1.8', required: false)
+if not samplerate_dep.found ()
+  samplerate_subproject = cmake.subproject (
+    'samplerate', options: cmake_opts)
+  samplerate_dep = samplerate_subproject.dependency (
+    'samplerate')
+endif
+sndfile_dep = dependency (
+  'sndfile', version: '>=1.0.25', required: false)
+if not sndfile_dep.found ()
+  sndfile_subproject = cmake.subproject (
+    'sndfile', options: cmake_opts)
+  sndfile_dep = sndfile_subproject.dependency (
+    'sndfile')
+endif
 
-audec_deps += [
-  dependency('sndfile', version: '>=1.0.25'),
-  dependency('samplerate', version: '>=0.1.8'),
+audec_deps = [
+  sndfile_dep,
+  samplerate_dep,
   ]
 
 # create config.h and add to deps
