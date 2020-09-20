@@ -82,7 +82,7 @@ int main (
   /* try to access the last element (valgrind will
    * detect this if array is not large enough) */
   float frame =
-    out_frames[samples_read * nfo.channels - 1];
+    out_frames[(size_t) samples_read * nfo.channels - 1];
   (void) frame;
 
   audec_close (handle);
