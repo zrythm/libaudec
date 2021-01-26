@@ -162,9 +162,14 @@ if not sndfile_dep.found ()
     'sndfile')
 endif
 
+# Maths functions might be implemented in libm
+libm = cc.find_library (
+  'm', required: false)
+
 audec_deps = [
   sndfile_dep,
   samplerate_dep,
+  libm,
   ]
 
 # create config.h and add to deps
