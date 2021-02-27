@@ -124,13 +124,13 @@ ad_open_minimp3 (
   if (res)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_LOG_LEVEL_ERROR,
         "unable to open file '%s'.", filename);
       char err_str[600];
       err_to_string (res, err_str);
       puts (err_str);
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR, "error=%i", res);
+        AUDEC_LOG_LEVEL_ERROR, "error=%i", res);
       free (priv);
       return NULL;
     }

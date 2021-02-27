@@ -21,6 +21,23 @@
 
 #include <audec/audec.h>
 
+void
+audec_log (
+  const char *    func,
+  AudecLogLevel level,
+  const char *    format,
+  ...);
+
+static void
+log_fn (
+  AudecLogLevel level,
+  const char *    fmt,
+  va_list         args)
+{
+  fprintf (stderr, "using log fn\n");
+  vfprintf (stderr, fmt, args);
+}
+
 int main (
   int argc, const char* argv[])
 {
@@ -84,6 +101,13 @@ int main (
   float frame =
     out_frames[(size_t) samples_read * nfo.channels - 1];
   (void) frame;
+
+  /* test log function */
+  audec_set_log_func (log_fn);
+
+  audec_log (
+    __func__, AUDEC_LOG_LEVEL_DEBUG,
+    "abc %s %s\n", "abc2", "abc3");
 
   audec_close (handle);
   free (out_frames);

@@ -377,7 +377,7 @@ const ad_plugin * adp_get_ffmpeg() {
 #endif
     av_register_all();
     avcodec_register_all();
-    if(ad_debug_level <= 1)
+    if(audec_log_level <= 1)
       av_log_set_level(AV_LOG_QUIET);
     else
       av_log_set_level(AV_LOG_VERBOSE);

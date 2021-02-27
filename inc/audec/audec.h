@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Alexandros Theodotou <alex at zrythm dot org>
+ * Copyright (C) 2019-2021 Alexandros Theodotou <alex at zrythm dot org>
  *
  * This file is part of libaudec
  *
@@ -70,14 +70,22 @@ typedef struct AudecInfo
   AudecHandle * handle;
 } AudecInfo;
 
-typedef enum AudecDebugLevel
+typedef enum AudecLogLevel
 {
-  AUDEC_DEBUG_LEVEL_SILENT = -1,
-  AUDEC_DEBUG_LEVEL_ERROR,
-  AUDEC_DEBUG_LEVEL_INFO,
-  AUDEC_DEBUG_LEVEL_DEBUG,
-  AUDEC_DEBUG_LEVEL_TRACE,
-} AudecDebugLevel;
+  AUDEC_LOG_LEVEL_SILENT = -1,
+  AUDEC_LOG_LEVEL_ERROR,
+  AUDEC_LOG_LEVEL_INFO,
+  AUDEC_LOG_LEVEL_DEBUG,
+  AUDEC_LOG_LEVEL_TRACE,
+} AudecLogLevel;
+
+/**
+ * Logging function prototype.
+ */
+typedef void (*audec_log_fn_t)(
+  AudecLogLevel level,
+  const char *    fmt,
+  va_list         args);
 
 /**
  * Global init function - register codecs.
@@ -215,8 +223,19 @@ audec_read_mono_dbl (
  */
 void
 audec_dump_info (
-  AudecDebugLevel dbglvl,
+  AudecLogLevel dbglvl,
   AudecInfo *     nfo);
+
+/**
+ * Specify a log callback for audec to write
+ * log entries to.
+ *
+ * If this is not set, libaudec will write
+ * warnings and errors to stderr.
+ */
+void
+audec_set_log_func (
+  audec_log_fn_t log_fn);
 
 /**
  * Set audio-decoder debug level.
@@ -226,8 +245,8 @@ audec_dump_info (
  * @param lvl debug-level threshold.
  */
 void
-audec_set_debug_level (
-  AudecDebugLevel lvl);
+audec_set_log_level (
+  AudecLogLevel lvl);
 
 #ifdef __cplusplus
 }  /* extern "C" */

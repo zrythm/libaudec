@@ -92,12 +92,12 @@ static void * ad_open_sndfile (
   if (!(priv->sffile))
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_LOG_LEVEL_ERROR,
         "unable to open file '%s'.", filename);
       puts (sf_strerror (NULL));
       int e = sf_error (NULL);
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR, "error=%i", e);
+        AUDEC_LOG_LEVEL_ERROR, "error=%i", e);
       free (priv);
       return NULL;
     }

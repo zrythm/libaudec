@@ -49,8 +49,10 @@
 
 #include "ad_plugin.h"
 
-AudecDebugLevel ad_debug_level =
-  AUDEC_DEBUG_LEVEL_ERROR;
+AudecLogLevel audec_log_level =
+  AUDEC_LOG_LEVEL_ERROR;
+
+audec_log_fn_t log_fn = NULL;
 
 #define UNUSED(x) (void)(x)
 int     ad_eval_null(const char *f) { UNUSED(f); return -1; }
@@ -67,7 +69,10 @@ typedef struct adecoder
   ad_plugin const * plugin;
 
   /** Backend data, such as SF file. */
-  void *              data;
+  void *            data;
+
+  /* Log function. */
+  audec_log_fn_t    log_fn;
 } adecoder;
 
 /* samplecat api */
@@ -121,7 +126,7 @@ audec_open (
   if (!decoder->plugin)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_LOG_LEVEL_ERROR,
         "fatal: no decoder backend available");
       free(decoder);
       return NULL;
@@ -196,7 +201,7 @@ get_buf_size_for_sample_rate (
       if (src_is_valid_ratio (resample_ratio) == 0)
         {
           dbg (
-            AUDEC_DEBUG_LEVEL_ERROR,
+            AUDEC_LOG_LEVEL_ERROR,
             "Sample rate change out of valid "
             "range.");
           return -1;
@@ -238,7 +243,7 @@ audec_read (
   if (*out != NULL)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_LOG_LEVEL_ERROR,
         "Please set 'out' to NULL before calling "
         "audec_read()");
       return -1;
@@ -260,7 +265,7 @@ audec_read (
   if (ret != (ssize_t) in_len)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_DEBUG,
+        AUDEC_LOG_LEVEL_DEBUG,
         "Number of read in frames %zu not equal to "
         "given buf size %zd",
         ret, in_len);
@@ -269,7 +274,7 @@ audec_read (
   if (ret > (ssize_t) in_len)
     {
       dbg (
-        AUDEC_DEBUG_LEVEL_ERROR,
+        AUDEC_LOG_LEVEL_ERROR,
         "Number of read in frames %zu greater than "
         "given buf size %zd",
         ret, in_len);
@@ -304,7 +309,7 @@ audec_read (
           if (!state)
             {
               dbg (
-                AUDEC_DEBUG_LEVEL_ERROR,
+                AUDEC_LOG_LEVEL_ERROR,
                 "Failed to create a src callback: "
                 "%s", src_strerror (err));
               free (in);
@@ -343,7 +348,7 @@ audec_read (
               if (err_ret)
                 {
                   dbg (
-                    AUDEC_DEBUG_LEVEL_ERROR,
+                    AUDEC_LOG_LEVEL_ERROR,
                     "An error occurred during "
                     "resampling: %s",
                     src_strerror (err_ret));
@@ -366,7 +371,7 @@ audec_read (
           if (total_read != num_out_frames)
             {
               dbg (
-                AUDEC_DEBUG_LEVEL_INFO,
+                AUDEC_LOG_LEVEL_INFO,
                 "Total frames read (%zu) and out "
                 "frames expected (%zu) do not match",
                 total_read, num_out_frames);
@@ -374,7 +379,7 @@ audec_read (
           if (frames_read == -1)
             {
               dbg (
-                AUDEC_DEBUG_LEVEL_ERROR,
+                AUDEC_LOG_LEVEL_ERROR,
                 "An error has occurred in "
                 "resampling: frames read == -1");
               free (*out);
@@ -384,7 +389,7 @@ audec_read (
           ret = total_read;
 
           dbg (
-            AUDEC_DEBUG_LEVEL_INFO,
+            AUDEC_LOG_LEVEL_INFO,
             "%zu frames read after resampling "
             "(out buffer size %zu)",
             total_read, out_buf_size);
@@ -396,7 +401,7 @@ audec_read (
       ret = nfo.frames;
 
       dbg (
-        AUDEC_DEBUG_LEVEL_INFO,
+        AUDEC_LOG_LEVEL_INFO,
         "No resampling done, returning %" PRIi64 " frames "
         "(out buffer size %zu)",
         nfo.frames, ret);
@@ -461,7 +466,7 @@ audec_free_nfo (
 
 void
 audec_dump_info (
-  AudecDebugLevel dbglvl,
+  AudecLogLevel dbglvl,
   AudecInfo *     nfo)
 {
   dbg(dbglvl, "sample_rate: %u", nfo->sample_rate);
@@ -475,16 +480,20 @@ audec_dump_info (
 }
 
 void
-ad_debug_printf (
+audec_log (
   const char *    func,
-  AudecDebugLevel level,
+  AudecLogLevel level,
   const char *    format,
   ...)
 {
   va_list args;
 
   va_start (args, format);
-  if (level <= ad_debug_level)
+  if (log_fn)
+    {
+      log_fn (level, format, args);
+    }
+  else if (level <= audec_log_level)
     {
       fprintf (stderr, "%s(): ", func);
       vfprintf (stderr, format, args);
@@ -494,8 +503,15 @@ ad_debug_printf (
 }
 
 void
-audec_set_debug_level (
-  AudecDebugLevel lvl)
+audec_set_log_func (
+  audec_log_fn_t _log_fn)
 {
-  ad_debug_level = lvl;
+  log_fn = _log_fn;
+}
+
+void
+audec_set_log_level (
+  AudecLogLevel lvl)
+{
+  audec_log_level = lvl;
 }

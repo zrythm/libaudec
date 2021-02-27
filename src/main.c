@@ -55,7 +55,7 @@ main (int    argc,
       AudecInfo nfo;
       AudecHandle * handle =
         audec_open (arg2, &nfo);
-      audec_dump_info (AUDEC_DEBUG_LEVEL_ERROR, &nfo);
+      audec_dump_info (AUDEC_LOG_LEVEL_ERROR, &nfo);
       int ret = audec_close (handle);
       if (ret)
         {

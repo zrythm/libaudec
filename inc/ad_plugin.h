@@ -42,7 +42,7 @@
 
 /** Prints a debug message. */
 #define dbg(_level, _fmt, ...) \
-  ad_debug_printf (__func__, _level, _fmt, ##__VA_ARGS__)
+  audec_log (__func__, _level, _fmt, ##__VA_ARGS__)
 
 #define MIN(A,B) ((A) < (B) ? (A) : (B))
 #define MAX(A,B) ((A) > (B) ? (A) : (B))
@@ -62,13 +62,13 @@
 # define PRIi64   __PRI64_PREFIX "i"
 #endif
 
-extern int ad_debug_level;
+extern int audec_log_level;
 
 void
-ad_debug_printf (
-  const char *    func,
-  AudecDebugLevel level,
-  const char *    format,
+audec_log (
+  const char *  func,
+  AudecLogLevel level,
+  const char *  format,
   ...);
 
 typedef struct ad_plugin
