@@ -211,7 +211,7 @@ audec = both_libraries (
 libaudec_dep = declare_dependency (
   include_directories: inc,
   dependencies: audec_deps,
-  link_with: audec)
+  link_with: audec.get_static_lib ())
 
 if not meson.is_subproject()
   pkg_mod = import('pkgconfig')
