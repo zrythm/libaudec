@@ -49,7 +49,7 @@
 
 #include "ad_plugin.h"
 
-AudecLogLevel audec_log_level =
+AudecLogLevel ad_log_level =
   AUDEC_LOG_LEVEL_ERROR;
 
 audec_log_fn_t log_fn = NULL;
@@ -480,7 +480,7 @@ audec_dump_info (
 }
 
 void
-audec_log (
+ad_log (
   const char *    func,
   AudecLogLevel level,
   const char *    format,
@@ -493,7 +493,7 @@ audec_log (
     {
       log_fn (level, format, args);
     }
-  else if (level <= audec_log_level)
+  else if (level <= ad_log_level)
     {
       fprintf (stderr, "%s(): ", func);
       vfprintf (stderr, format, args);
@@ -513,5 +513,5 @@ void
 audec_set_log_level (
   AudecLogLevel lvl)
 {
-  audec_log_level = lvl;
+  ad_log_level = lvl;
 }

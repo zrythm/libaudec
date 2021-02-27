@@ -1,0 +1,6 @@
+V@VERSION@ {
+  global:
+    audec_*;
+  local:
+    *;
+};

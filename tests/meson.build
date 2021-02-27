@@ -36,4 +36,17 @@ if get_option ('tests')
         meson.current_source_dir(), 'test.mp3'),
       '48000',
       ])
+  log_test = executable (
+    'log_test_exe', 'log.c',
+    include_directories: inc,
+    link_with: audec.get_static_lib (),
+    c_args: audec_cflags,
+    )
+  test (
+    'log_test', log_test,
+    args: [
+      join_paths (
+        meson.current_source_dir(), 'test.wav'),
+      '44000',
+      ])
 endif

@@ -42,7 +42,7 @@
 
 /** Prints a debug message. */
 #define dbg(_level, _fmt, ...) \
-  audec_log (__func__, _level, _fmt, ##__VA_ARGS__)
+  ad_log (__func__, _level, _fmt, ##__VA_ARGS__)
 
 #define MIN(A,B) ((A) < (B) ? (A) : (B))
 #define MAX(A,B) ((A) > (B) ? (A) : (B))
@@ -62,10 +62,10 @@
 # define PRIi64   __PRI64_PREFIX "i"
 #endif
 
-extern int audec_log_level;
+extern int ad_log_level;
 
 void
-audec_log (
+ad_log (
   const char *  func,
   AudecLogLevel level,
   const char *  format,

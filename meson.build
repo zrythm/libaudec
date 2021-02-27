@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Alexandros Theodotou <alex at zrythm dot org>
+# Copyright (C) 2019-2021 Alexandros Theodotou <alex at zrythm dot org>
 #
 # This file is part of libaudec
 #
@@ -17,7 +17,7 @@
 
 project (
   'libaudec', ['c'],
-  version: '0.2.4',
+  version: '0.3.1',
   license: 'AGPLv3+',
   meson_version: '>= 0.55.0',
   default_options: [
@@ -186,13 +186,22 @@ config_h_dep = declare_dependency (
   )
 audec_deps += config_h_dep
 
-audec = static_library (
+mapfile = configure_file(
+  input: 'link.map.in',
+  output: 'link.map',
+  configuration: { 'VERSION': meson.project_version () },
+)
+vflag = '-Wl,--version-script,@0@'.format (mapfile)
+
+audec = both_libraries (
   'audec',
   sources: srcs,
   dependencies: [
     audec_deps,
     ],
   include_directories: inc,
+  link_args: vflag,
+  link_depends: mapfile,
   install: not meson.is_subproject(),
 )
 
