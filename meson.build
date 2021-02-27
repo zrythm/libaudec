@@ -36,7 +36,7 @@ subdir('inc')
 subdir('src')
 
 cc = meson.get_compiler ('c')
-is_gcc = cc.get_id () == 'gcc'
+is_ld_bfd = cc.get_linker_id () == 'ld.bfd'
 prefix = get_option ('prefix')
 includedir = join_paths (
   prefix, get_option('includedir'))
@@ -202,8 +202,8 @@ audec = both_libraries (
     audec_deps,
     ],
   include_directories: inc,
-  link_args: is_gcc ? vflag : [],
-  link_depends: is_gcc ? mapfile : [],
+  link_args: is_ld_bfd ? vflag : [],
+  link_depends: is_ld_bfd ? mapfile : [],
   install: not meson.is_subproject(),
 )
 
