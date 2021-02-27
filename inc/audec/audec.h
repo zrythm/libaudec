@@ -42,8 +42,9 @@
 extern "C" {
 #endif
 
-#include <unistd.h>
+#include <stdarg.h>
 #include <stdint.h>
+#include <unistd.h>
 
 typedef void AudecHandle;
 

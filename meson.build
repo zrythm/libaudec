@@ -17,7 +17,7 @@
 
 project (
   'libaudec', ['c'],
-  version: '0.3.1',
+  version: '0.3.2',
   license: 'AGPLv3+',
   meson_version: '>= 0.55.0',
   default_options: [
