@@ -46,6 +46,26 @@ extern "C" {
 #include <stdint.h>
 #include <unistd.h>
 
+/**
+   Helper macro needed for AUDEC_SYMBOL_EXPORT when using C++.
+*/
+#ifdef __cplusplus
+#  define AUDEC_SYMBOL_EXTERN extern "C"
+#else
+#  define AUDEC_SYMBOL_EXTERN
+#endif
+
+/**
+   Put this (AUDEC_SYMBOL_EXPORT) before any functions that are to be loaded
+   by the host as a symbol from the dynamic library.
+*/
+#ifdef _WIN32
+#  define AUDEC_SYMBOL_EXPORT AUDEC_SYMBOL_EXTERN __declspec(dllexport)
+#else
+#  define AUDEC_SYMBOL_EXPORT \
+    AUDEC_SYMBOL_EXTERN __attribute__((visibility("default")))
+#endif
+
 typedef void AudecHandle;
 
 typedef struct AudecInfo
@@ -88,13 +108,14 @@ typedef void (*audec_log_fn_t)(
   const char *    fmt,
   va_list         args);
 
+/* --- public API --- */
+
 /**
  * Global init function - register codecs.
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_init (void);
-
-/* --- public API --- */
 
 /**
  * Open an audio file.
@@ -106,6 +127,7 @@ audec_init (void);
  * @return NULL on error, a pointer to an opaque
  * soundfile-decoder object on success.
  */
+AUDEC_SYMBOL_EXPORT
 AudecHandle *
 audec_open (
   const char * filename,
@@ -117,6 +139,7 @@ audec_open (
  * @param handle Decoder handle.
  * @return 0 on succees, -1 if sf was invalid or not open (return value can usually be ignored)
  */
+AUDEC_SYMBOL_EXPORT
 int
 audec_close (
   AudecHandle * handle);
@@ -132,6 +155,7 @@ audec_close (
  * samples) from the start of the file. On error this
  * function returns -1.
  */
+AUDEC_SYMBOL_EXPORT
 int64_t
 audec_seek (
   AudecHandle * handle,
@@ -154,6 +178,7 @@ audec_seek (
  * @return the total number of read samples for each
  * channel.
  */
+AUDEC_SYMBOL_EXPORT
 ssize_t
 audec_read (
   AudecHandle * handle,
@@ -173,6 +198,7 @@ audec_read (
  * information about the file.
  * @return 0 on succees, -1 if sf was invalid or not open
  */
+AUDEC_SYMBOL_EXPORT
 int
 audec_info (
   AudecHandle * decoder_handle,
@@ -184,6 +210,7 @@ audec_info (
  *
  * @param nfo pointer to a adinfo struct
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_clear_nfo (
   AudecInfo * nfo);
@@ -191,6 +218,7 @@ audec_clear_nfo (
 /** free possibly allocated meta-data text
  * @param nfo pointer to a adinfo struct
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_free_nfo (
   AudecInfo * nfo);
@@ -203,6 +231,7 @@ audec_free_nfo (
  *
  * Combines ad_open() and ad_close().
  */
+AUDEC_SYMBOL_EXPORT
 int
 audec_finfo (
   const char * filename,
@@ -212,6 +241,7 @@ audec_finfo (
  * Wrapper around \ref audec_read, downmixes all channels to
  * mono.
  */
+AUDEC_SYMBOL_EXPORT
 ssize_t
 audec_read_mono_dbl (
   void *, AudecInfo *, double*, size_t, int);
@@ -222,6 +252,7 @@ audec_read_mono_dbl (
  * @param dbglvl
  * @param info
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_dump_info (
   AudecLogLevel dbglvl,
@@ -234,6 +265,7 @@ audec_dump_info (
  * If this is not set, libaudec will write
  * warnings and errors to stderr.
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_set_log_func (
   audec_log_fn_t log_fn);
@@ -245,6 +277,7 @@ audec_set_log_func (
  *
  * @param lvl debug-level threshold.
  */
+AUDEC_SYMBOL_EXPORT
 void
 audec_set_log_level (
   AudecLogLevel lvl);

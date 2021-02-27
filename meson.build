@@ -17,7 +17,7 @@
 
 project (
   'libaudec', ['c'],
-  version: '0.3.2',
+  version: '0.3.3',
   license: 'AGPLv3+',
   meson_version: '>= 0.55.0',
   default_options: [
@@ -136,6 +136,7 @@ audec_cflags = [
   '-Werror=int-in-bool-context',
   '-Werror=type-limits',
   '-Werror=deprecated-declarations',
+  '-fvisibility=hidden',
   ]
 if os_windows
   audec_cflags += [
