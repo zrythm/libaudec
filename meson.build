@@ -36,6 +36,7 @@ subdir('inc')
 subdir('src')
 
 cc = meson.get_compiler ('c')
+is_gcc = cc.get_id () == 'gcc'
 prefix = get_option ('prefix')
 includedir = join_paths (
   prefix, get_option('includedir'))
@@ -201,8 +202,8 @@ audec = both_libraries (
     audec_deps,
     ],
   include_directories: inc,
-  link_args: vflag,
-  link_depends: mapfile,
+  link_args: is_gcc ? vflag : [],
+  link_depends: is_gcc ? mapfile : [],
   install: not meson.is_subproject(),
 )
 
