@@ -145,6 +145,7 @@ audec_info (
   AudecHandle * handle,
   AudecInfo *   nfo)
 {
+  memset (nfo, 0, sizeof (AudecInfo));
   adecoder * decoder = (adecoder *) handle;
   if (!decoder)
     return -1;

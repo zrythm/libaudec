@@ -21,6 +21,7 @@ tasks:
   - test: |
       cd libaudec
       ninja -C build test
+      ../meson/meson.py test -C build --wrap="valgrind --error-exitcode=1"
   - install: |
       cd libaudec
       DESTDIR=/tmp ninja -C build install
