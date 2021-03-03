@@ -8,6 +8,7 @@ packages:
   - libsndfile-devel
   - libsamplerate-devel
   - meson
+  - valgrind
 sources:
   - https://git.sr.ht/~alextee/libaudec
   - https://github.com/mesonbuild/meson
