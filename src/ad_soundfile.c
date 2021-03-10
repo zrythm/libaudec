@@ -162,21 +162,12 @@ static int ad_eval_sndfile(const char *f) {
 }
 
 static const ad_plugin ad_sndfile = {
-#if 1
   .eval = &ad_eval_sndfile,
   .open = &ad_open_sndfile,
   .close = &ad_close_sndfile,
   .info = &ad_info_sndfile,
   .seek = &ad_seek_sndfile,
   .read = &ad_read_sndfile
-#else
-  &ad_eval_null,
-  &ad_open_null,
-  &ad_close_null,
-  &ad_info_null,
-  &ad_seek_null,
-  &ad_read_null
-#endif
 };
 
 /* dlopen handler */

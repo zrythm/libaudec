@@ -182,21 +182,12 @@ static int ad_eval_minimp3(const char *f)
 }
 
 static const ad_plugin ad_minimp3 = {
-#if 1
   .eval = &ad_eval_minimp3,
   .open = &ad_open_minimp3,
   .close = &ad_close_minimp3,
   .info = &ad_info_minimp3,
   .seek = &ad_seek_minimp3,
   .read = &ad_read_minimp3
-#else
-  &ad_eval_null,
-  &ad_open_null,
-  &ad_close_null,
-  &ad_info_null,
-  &ad_seek_null,
-  &ad_read_null
-#endif
 };
 
 /* dlopen handler */

@@ -289,10 +289,8 @@ static ssize_t ad_read_ffmpeg(void *sf, float* d, size_t len) {
           dbg(2, " !!! sync buffer to seek. (diff:%i)", diff);
           priv->m_tmpBufferStart+= diff*priv->codecContext->channels;
           priv->m_tmpBufferLen  -= diff*priv->codecContext->channels;
-#if 1
           memmove(priv->m_tmpBuffer, priv->m_tmpBufferStart, priv->m_tmpBufferLen);
           priv->m_tmpBufferStart = priv->m_tmpBuffer;
-#endif
           priv->seek_frame=0;
           priv->decoder_clock += diff;
         } else if (data_size > 0) {
