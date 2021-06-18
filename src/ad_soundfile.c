@@ -73,9 +73,12 @@ ad_info_sndfile (
       nfo->meta_data = NULL;
 
       SF_LOOP_INFO loop;
-      sf_command (
-        priv->sffile, SFC_GET_LOOP_INFO, &loop, sizeof (loop));
-      nfo->bpm = loop.bpm;
+      if (sf_command (
+            priv->sffile, SFC_GET_LOOP_INFO,
+            &loop, sizeof (loop)) == SF_TRUE)
+        {
+          nfo->bpm = loop.bpm;
+        }
     }
   return 0;
 }
