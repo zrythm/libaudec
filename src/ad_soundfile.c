@@ -161,6 +161,9 @@ static int ad_eval_sndfile(const char *f) {
 // libsndfile >= 1.0.18
   if (!strcasecmp(ext, ".flac")) return 80;
   if (!strcasecmp(ext, ".ogg")) return 80;
+#ifdef LIBSNDFILE_HAVE_MP3
+  if (!strcasecmp(ext, ".mp3")) return 80;
+#endif
   return 0;
 }
 

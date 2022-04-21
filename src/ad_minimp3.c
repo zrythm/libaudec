@@ -177,7 +177,7 @@ static int ad_eval_minimp3(const char *f)
   char *ext = strrchr(f, '.');
   if (strstr (f, "://")) return 0;
   if (!ext) return 5;
-  if (!strcasecmp(ext, ".mp3")) return 100;
+  if (!strcasecmp(ext, ".mp3")) return 50;
   return 0;
 }
 

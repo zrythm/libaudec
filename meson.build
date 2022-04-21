@@ -163,6 +163,12 @@ if not sndfile_dep.found ()
   sndfile_dep = sndfile_subproject.dependency (
     'sndfile')
 endif
+# this is not enough - need to check dependencies for
+# libmp3lame because most distros build without it
+if sndfile_dep.version ().version_compare ('>=1.1.0') and false
+  cdata.set (
+    'LIBSNDFILE_HAVE_MP3', 0)
+endif
 
 # Maths functions might be implemented in libm
 libm = cc.find_library (
